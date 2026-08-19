@@ -21,7 +21,6 @@ from gpaw.solvation import (
 )
 
 
-
 @tb.workflow
 class calc_solv_RMC_Workflow(Row_descriptor):
     relaxed_atoms = tb.var()
@@ -41,7 +40,7 @@ class calc_solv_RMC_Workflow(Row_descriptor):
 
     @tb.task
     def write_solv_result(self):
-        return tb.node(lambda at: update_db(self.db_dir, dict(id=self.db_id, solvation_E=self.subtract_solv_corr)), at=self.run_optimisation)
+        return tb.node(lambda at: update_db(self.db_path, dict(id=self.db_id, solvation_E=self.subtract_solv_corr)), at=self.run_optimisation)
 
 
 def calc_non_solvation_sp_func(row_dc, atoms, FD_bool):

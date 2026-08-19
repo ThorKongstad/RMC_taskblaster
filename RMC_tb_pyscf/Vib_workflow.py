@@ -2,8 +2,10 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from RMC_taskblaster import sanitize, folder_exist, update_db
-from RMC_taskblaster.workflow import Row_descriptor
+from RMC_tb_pyscf import sanitize, folder_exist, update_db
+from RMC_tb_pyscf.workflow import Row_descriptor
+from RMC_tb_pyscf.calculator_prepare import calculation_setter
+
 
 import numpy as np
 import taskblaster as tb
@@ -47,6 +49,9 @@ def calc_vibration(row_dc, atoms):
     locked_metals = list(filter(lambda i: (atoms[i].position[2] < (avg_metal_z_pos + 0.4)) and atoms[i].symbol not in metal_symbol, list(range(len(atoms)))))
 
     atoms.set_constraint(constraint=FixAtoms(locked_metals))
+
+    calculation_setter(atoms, row_dc)
+
 
     vib = Vibrations(atoms, indices=atoms_for_vib, name=f'{functional_folder}/{file_name}')
     vib.run()
