@@ -1,13 +1,29 @@
 import os
 import time
 from typing import NoReturn, Sequence, Tuple, Never, Optional, NamedTuple
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, make_dataclass
 from itertools import chain
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 import numpy as np
 import ase.db as db
 import pandas as pd
 from sqlite3 import OperationalError
+import taskblaster as tb
+
+
+@tb.workflow
+class Row_descriptor:
+    db_path = tb.var()
+    db_id = tb.var()
+    atoms = tb.var()
+    calc_params = tb.var()
+    xc = tb.var()
+    dftd4 = tb.var()
+    structure_str = tb.var()
+    adsorbate_str = tb.var()
+
+    def as_dict(self): return dict(vars(self))
+    def as_dc(self): return make_dataclass('Row_descriptor_dc', list(self.as_dict().keys()))(**self.as_dict())
 
 
 @dataclass
