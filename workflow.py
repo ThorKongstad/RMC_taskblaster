@@ -39,7 +39,7 @@ class Workflow:
 
     @tb.dynamical_workflow_generator({'results': '*/*'})
     def rows(self):
-        return tb.node('tasks.generate_row_workflows', db_paths=self.db_paths)
+        return tb.node(generate_row_workflows, db_paths=self.db_paths)
 
 
 @tb.dynamical_workflow_generator_task
