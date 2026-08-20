@@ -1,3 +1,4 @@
+import os
 import pathlib
 import sys
 
@@ -25,7 +26,7 @@ def optimise(row_dc, fmax: float=0.03):
     parprint(f'outstd of opt calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
 
     functional_folder = sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
-    if world.rank == 0: folder_exist(functional_folder)
+    if world.rank == 0: folder_exist(os.path.basename(row_dc.db_path) + functional_folder)
 
     row_dc.atoms.calc['txt'] = f'{functional_folder}/opt_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
 

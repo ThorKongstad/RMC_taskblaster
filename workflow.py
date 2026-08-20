@@ -2,6 +2,8 @@ import argparse
 import pickle
 import pathlib
 import sys
+import os
+import warnings
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import Row_descriptor
@@ -45,6 +47,8 @@ class Workflow:
 @tb.dynamical_workflow_generator_task
 def generate_row_workflows(db_paths):
     for db_path in db_paths:
+        if not os.path.basename(db_path) in os.listdir(db_path if len(db_path := os.path.dirname(db_path)) > 0 else '.'): warnings.warn("Can't find database")
+
         conn = db.connect(db_path)
         for row in conn.select():
             atoms = row.toatoms()
