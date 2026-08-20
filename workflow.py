@@ -57,7 +57,7 @@ def generate_row_workflows(db_paths):
             calc_params = pickle.loads(eval(row.data.get('dft_calc_pickle')))
             calc_params['charge'] = row.get('gpaw_charge')
 
-            calculation_setter(atoms=atoms, calc_params=calc_params, dftd4=row.data['dftd4'])
+            calculation_setter(atoms=atoms, calc_params=calc_params, dftd4=row.get('dftd4', False))
 
             wf = RMC_Row_Workflow(
                 db_path=db_path,
@@ -65,7 +65,7 @@ def generate_row_workflows(db_paths):
                 atoms=atoms,
                 calc_params=calc_params,
                 xc=row.get('xc'),
-                dftd4=row.get('dftd4'),
+                dftd4=row.get('dftd4', False),
                 structure_str=row.get('structure_str'),
                 adsorbate_str=row.get('adsorbate_str'),
             )
