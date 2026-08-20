@@ -22,7 +22,17 @@ class Row_descriptor:
     structure_str = tb.var()
     adsorbate_str = tb.var()
 
-    def as_dict(self): return dict(vars(self))
+    def as_dict(self): return dict(
+        db_path = self.db_path,
+        db_id = self.db_id,
+        atoms = self.atoms,
+        calc_params = self.calc_params,
+        xc = self.xc,
+        dftd4 = self.dftd4,
+        structure_str = self.structure_str,
+        adsorbate_str = self.adsorbate_str,
+    )
+
     def as_dc(self): return make_dataclass('Row_descriptor_dc', list(self.as_dict().keys()))(**self.as_dict())
 
     @tb.task
