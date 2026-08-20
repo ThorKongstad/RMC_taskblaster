@@ -2,6 +2,7 @@ import os
 import pathlib
 import sys
 from copy import deepcopy
+from functools import partial
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import sanitize, folder_exist, update_db
@@ -41,7 +42,7 @@ class calc_solv_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'organise'})
     def write_solv_result(self):
-        return tb.node(lambda at: update_db(self.db_path, dict(id=self.db_id, solvation_E=self.subtract_solv_corr)), at=self.relaxed_atoms)
+        return tb.node(partial(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, solvation_E=self.subtract_solv_corr)))
 
 
 def calc_non_solvation_sp_func(row_wf, atoms, FD_bool):

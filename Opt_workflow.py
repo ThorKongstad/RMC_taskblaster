@@ -1,6 +1,7 @@
 import os
 import pathlib
 import sys
+from functools import partial
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import sanitize, folder_exist, update_db
@@ -19,7 +20,7 @@ class Opt_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'organise'})
     def write_opt_result(self):
-        return tb.node(lambda at: update_db(self.db_path, dict(id=self.db_id, atoms=at, relaxed=True, vibration=False, vib_en=False)), at=self.run_optimisation)
+        return tb.node(partial(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, atoms=self.run_optimisation, relaxed=True, vibration=False, vib_en=False)))
 
 
 def optimise(row_wf, fmax: float=0.03):

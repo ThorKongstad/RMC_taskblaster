@@ -1,6 +1,7 @@
 import pathlib
 import sys
 import os
+from functools import partial
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import sanitize, folder_exist, update_db
@@ -24,7 +25,7 @@ class Vib_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'organise'})
     def write_opt_result(self):
-        return tb.node(lambda vib_res: update_db(self.db_path, vib_res), vib_res=self.run_vibration)
+        return tb.node(partial(update_db, db_dir=self.db_path, db_update_args=self.run_vibration))
 
 
 def calc_vibration(row_wf, atoms):
