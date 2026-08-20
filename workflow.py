@@ -54,7 +54,7 @@ def generate_row_workflows(db_paths):
         conn = db.connect(db_path)
         for row in conn.select():
             atoms = row.toatoms()
-            calc_params = pickle.loads(row.data['dft_calc_pickle'])
+            calc_params = pickle.loads(eval(row.data.get('dft_calc_pickle')))
             calc_params['charge'] = row.get('gpaw_charge')
 
             calculation_setter(atoms=atoms, calc_params=calc_params, dftd4=row.data['dftd4'])
