@@ -40,7 +40,7 @@ class Row_descriptor:
 
     @tb.task
     def doing_nothing(self):
-        return tb.node(do_nothing())
+        return tb.node(do_nothing)
 
 
 @dataclass
