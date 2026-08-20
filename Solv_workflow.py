@@ -41,7 +41,7 @@ class calc_solv_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'organise'})
     def write_solv_result(self):
-        return tb.node(lambda at: update_db(self.db_path, dict(id=self.db_id, solvation_E=self.subtract_solv_corr)), at=self.run_optimisation)
+        return tb.node(lambda at: update_db(self.db_path, dict(id=self.db_id, solvation_E=self.subtract_solv_corr)), at=self.relaxed_atoms)
 
 
 def calc_non_solvation_sp_func(row_wf, atoms, FD_bool):
