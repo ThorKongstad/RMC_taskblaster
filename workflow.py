@@ -47,7 +47,9 @@ class Workflow:
 @tb.dynamical_workflow_generator_task
 def generate_row_workflows(db_paths):
     for db_path in db_paths:
-        if not os.path.basename(db_path) in os.listdir(db_path if len(db_path := os.path.dirname(db_path)) > 0 else '.'): warnings.warn("Can't find database")
+        if not os.path.basename(db_path) in os.listdir(db_p if len(db_p := os.path.dirname(db_path)) > 0 else '.'):
+            warnings.warn(f"Can't find database: skipping {os.path.basename(db_path)}")
+            continue
 
         conn = db.connect(db_path)
         for row in conn.select():
