@@ -10,7 +10,7 @@ from RMC_taskblaster import folder_exist
 
 
 def calculation_setter(atoms, calc_params, dftd4_bool):
-    if 'txt' in calc_params.keys(): folder_exist(os.path.basename(calc_params['txt']))
+    if 'txt' in calc_params.keys(): calc_params.pop('txt', None)
     if dftd4_bool: calc = SumCalculator([DFTD4(method=calc_params['xc']), GPAW(**calc_params)])
     else: calc = GPAW(**calc_params)
     atoms.calc = calc
