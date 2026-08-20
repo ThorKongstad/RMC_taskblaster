@@ -17,11 +17,11 @@ from ase.thermochemistry import HarmonicThermo, IdealGasThermo
 class Vib_RMC_Workflow(Row_descriptor):
     relaxed_atoms = tb.var()
 
-    @tb.task
+    @tb.task(tags={'calculation'})
     def run_vibration(self):
         return tb.node(calc_vibration, row_dc=self.as_dc(), atoms=self.relaxed_atoms)
 
-    @tb.task
+    @tb.task(tags={'organise'})
     def write_opt_result(self):
         return tb.node(lambda vib_res: update_db(self.db_path, vib_res), vib_res=self.run_vibration)
 

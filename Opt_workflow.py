@@ -12,11 +12,11 @@ from ase.parallel import parprint, world, barrier
 
 @tb.workflow
 class Opt_RMC_Workflow(Row_descriptor):
-    @tb.task
+    @tb.task(tags={'calculation'})
     def run_optimisation(self, fmax: float = 0.03):
         return tb.node(optimise, row_dc=self.as_dc(), fmax=fmax)
 
-    @tb.task
+    @tb.task(tags={'organise'})
     def write_opt_result(self):
         return tb.node(lambda at: update_db(self.db_path, dict(id=self.db_id, atoms=at, relaxed=True, vibration=False, vib_en=False)), at=self.run_optimisation)
 

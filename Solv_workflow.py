@@ -26,19 +26,19 @@ class calc_solv_RMC_Workflow(Row_descriptor):
     relaxed_atoms = tb.var()
     FD_bool = tb.var(default=False)
 
-    @tb.task
+    @tb.task(tags={'Calculation'})
     def calc_non_solvation_sp(self):
         return tb.node(calc_non_solvation_sp_func, atoms=self.relaxed_atoms, row_dc=self.as_dc(), FD_bool=self.FD_bool)
 
-    @tb.task
+    @tb.task(tags={'Calculation'})
     def calc_solvation_sp(self):
         return tb.node(calc_solvation_sp_func, atoms=self.relaxed_atoms, row_dc=self.as_dc(), FD_bool=self.FD_bool)
 
-    @tb.task
+    @tb.task(tags={'organise'})
     def subtract_solv_corr(self):
         return tb.node(lambda gas, solv: solv-gas, gas=self.calc_non_solvation_sp, solv=self.calc_solvation_sp)
 
-    @tb.task
+    @tb.task(tags={'organise'})
     def write_solv_result(self):
         return tb.node(lambda at: update_db(self.db_path, dict(id=self.db_id, solvation_E=self.subtract_solv_corr)), at=self.run_optimisation)
 
