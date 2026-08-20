@@ -29,11 +29,11 @@ class calc_solv_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'Calculation'})
     def calc_non_solvation_sp(self):
-        return tb.node(calc_non_solvation_sp_func, atoms=self.relaxed_atoms, row_dc=self.as_dc(), FD_bool=self.FD_bool)
+        return tb.node(calc_non_solvation_sp_func, atoms=self.relaxed_atoms, row_wf=self, FD_bool=self.FD_bool)
 
     @tb.task(tags={'Calculation'})
     def calc_solvation_sp(self):
-        return tb.node(calc_solvation_sp_func, atoms=self.relaxed_atoms, row_dc=self.as_dc(), FD_bool=self.FD_bool)
+        return tb.node(calc_solvation_sp_func, atoms=self.relaxed_atoms, row_wf=self, FD_bool=self.FD_bool)
 
     @tb.task(tags={'organise'})
     def subtract_solv_corr(self):
@@ -44,28 +44,28 @@ class calc_solv_RMC_Workflow(Row_descriptor):
         return tb.node(lambda at: update_db(self.db_path, dict(id=self.db_id, solvation_E=self.subtract_solv_corr)), at=self.run_optimisation)
 
 
-def calc_non_solvation_sp_func(row_dc, atoms, FD_bool):
-    parprint(f'outstd of non-solvation sp calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.functional}')
+def calc_non_solvation_sp_func(row_wf, atoms, FD_bool):
+    parprint(f'outstd of non-solvation sp calculation for db entry {row_wf.db_id} with structure: {row_wf.structure_str}, adsorbate: {row_wf.adsorbate_str} and functional: {row_wf.functional}')
     atoms = atoms.copy()
-    functional_folder = os.path.basename(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
+    functional_folder = os.path.basename(row_wf.db_path) + '/' + sanitize(row_wf.xc) + ('_D4' if row_wf.dftd4 else '')
     if world.rank == 0: folder_exist(functional_folder)
 
     if FD_bool:
-        calc_params = deepcopy(row_dc.calc_params)
+        calc_params = deepcopy(row_wf.calc_params)
         calc_params.update({'mode': 'fd'})
         atoms.calc = GPAW(**calc_params)
 
-    atoms.calc['txt'] = os.path.basename(row_dc.db_path) + '/' + f'{functional_folder}/sp{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
+    atoms.calc['txt'] = os.path.basename(row_wf.db_path) + '/' + f'{functional_folder}/sp{'_fd' if FD_bool else ''}_id{row_wf.db_id}_{row_wf.structure_str}_{row_wf.adsorbate_str}.txt'
     return atoms.get_potential_energy()
 
 
-def calc_solvation_sp_func(row_dc, atoms, FD_bool):
-    parprint( f'outstd of solvation sp calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.functional}')
+def calc_solvation_sp_func(row_wf, atoms, FD_bool):
+    parprint( f'outstd of solvation sp calculation for db entry {row_wf.db_id} with structure: {row_wf.structure_str}, adsorbate: {row_wf.adsorbate_str} and functional: {row_wf.functional}')
     atoms = atoms.copy()
-    functional_folder = os.path.basename(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
+    functional_folder = os.path.basename(row_wf.db_path) + '/' + sanitize(row_wf.xc) + ('_D4' if row_wf.dftd4 else '')
     if world.rank == 0: folder_exist(functional_folder)
 
-    calc_params = deepcopy(row_dc.calc_params)
+    calc_params = deepcopy(row_wf.calc_params)
 
     if FD_bool:
         calc_params.update({'mode': 'fd'})
@@ -82,7 +82,7 @@ def calc_solvation_sp_func(row_dc, atoms, FD_bool):
         **calc_params)
     atoms.calc = calc
 
-    atoms.calc['txt'] = os.path.basename(row_dc.db_path) + '/' + f'{functional_folder}/solv{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
+    atoms.calc['txt'] = os.path.basename(row_wf.db_path) + '/' + f'{functional_folder}/solv{'_fd' if FD_bool else ''}_id{row_wf.db_id}_{row_wf.structure_str}_{row_wf.adsorbate_str}.txt'
 
     return atoms.get_potential_energy()
 
