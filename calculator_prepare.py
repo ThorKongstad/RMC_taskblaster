@@ -1,4 +1,5 @@
 import os
+import sys
 from gpaw import GPAW
 from dftd4.ase import DFTD4
 from ase.calculators.mixing import SumCalculator
