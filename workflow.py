@@ -19,8 +19,8 @@ import ase.db as db
 @tb.workflow
 class RMC_Row_Workflow(Row_descriptor):
     @tb.subworkflow
-    def task1_opt(self, fmax=0.03):
-        return Opt_RMC_Workflow(fmax=fmax, **self.as_dict())
+    def task1_opt(self):
+        return Opt_RMC_Workflow(**self.as_dict())
 
     @tb.subworkflow
     def task2_vib(self):

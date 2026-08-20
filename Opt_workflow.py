@@ -14,8 +14,8 @@ from ase.parallel import parprint, world, barrier
 @tb.workflow
 class Opt_RMC_Workflow(Row_descriptor):
     @tb.task(tags={'calculation'})
-    def run_optimisation(self, fmax: float = 0.03):
-        return tb.node(optimise, row_dc=self.as_dc(), fmax=fmax)
+    def run_optimisation(self):
+        return tb.node(optimise, row_dc=self.as_dc())
 
     @tb.task(tags={'organise'})
     def write_opt_result(self):
