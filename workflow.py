@@ -65,7 +65,7 @@ def generate_row_workflows(db_paths):
                 atoms=atoms,
                 calc_params=calc_params,
                 xc=row.get('xc'),
-                dftd4=row.get('dftd4', False),
+                dftd4_bool=row.get('dftd4', False),
                 structure_str=row.get('structure_str'),
                 adsorbate_str=row.get('adsorbate_str'),
             )
