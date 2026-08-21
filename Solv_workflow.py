@@ -38,11 +38,11 @@ class calc_solv_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'organise'})
     def subtract_solv_corr(self):
-        return tb.node(lambda gas, solv: solv-gas, gas=self.calc_non_solvation_sp, solv=self.calc_solvation_sp)
+        return tb.node(subtract, gas=self.calc_non_solvation_sp, solv=self.calc_solvation_sp)
 
     @tb.task(tags={'organise'})
     def write_solv_result(self):
-        return tb.node(partial(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, solvation_E=self.subtract_solv_corr)))
+        return tb.node(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, solvation_E=self.subtract_solv_corr))
 
 
 def calc_non_solvation_sp_func(row_wf, atoms, FD_bool):
@@ -86,4 +86,7 @@ def calc_solvation_sp_func(row_wf, atoms, FD_bool):
     atoms.calc['txt'] = os.path.basename(row_wf.db_path) + '/' + f'{functional_folder}/solv{'_fd' if FD_bool else ''}_id{row_wf.db_id}_{row_wf.structure_str}_{row_wf.adsorbate_str}.txt'
 
     return atoms.get_potential_energy()
+
+def subtract(gas, solv):
+    return solv - gas
 
