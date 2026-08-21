@@ -5,8 +5,7 @@ from copy import deepcopy
 from functools import partial
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from RMC_taskblaster import sanitize, folder_exist, update_db
-from RMC_taskblaster.workflow import Row_descriptor
+from RMC_taskblaster import sanitize, folder_exist, update_db, Row_descriptor
 
 import taskblaster as tb
 from ase.optimize import BFGS
