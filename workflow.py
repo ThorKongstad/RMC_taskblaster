@@ -7,7 +7,7 @@ import warnings
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import Row_descriptor
-from RMC_taskblaster.calculator_prepare import calculation_setter
+#from RMC_taskblaster.calculator_prepare import calculation_setter
 from RMC_taskblaster.Opt_workflow import Opt_RMC_Workflow
 from RMC_taskblaster.Vib_workflow import Vib_RMC_Workflow
 from RMC_taskblaster.Solv_workflow import calc_solv_RMC_Workflow
@@ -57,7 +57,7 @@ def generate_row_workflows(db_paths):
             calc_params = pickle.loads(eval(row.data.get('dft_calc_pickle')))
             calc_params['charge'] = row.get('gpaw_charge')
 
-            calculation_setter(atoms=atoms, calc_params=calc_params, dftd4_bool=row.get('dftd4', False))
+#            calculation_setter(atoms=atoms, calc_params=calc_params, dftd4_bool=row.get('dftd4', False))
 
             wf = RMC_Row_Workflow(
                 db_path=db_path,

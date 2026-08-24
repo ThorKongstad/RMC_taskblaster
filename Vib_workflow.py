@@ -5,6 +5,8 @@ import os
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import sanitize, folder_exist, update_db, Row_descriptor
+from RMC_taskblaster.calculator_prepare import calculation_setter
+
 
 import numpy as np
 import taskblaster as tb
@@ -35,7 +37,9 @@ def calc_vibration(row_wf, atoms):
     if world.rank == 0: folder_exist(functional_folder)
 
     file_name = f'vib_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}'
-    atoms.calc.txt = os.path.basename(row_dc.db_path) + f'/{functional_folder}/{file_name}.txt'
+    txt = os.path.basename(row_dc.db_path) + f'/{functional_folder}/{file_name}.txt'
+
+    calculation_setter(atoms=atoms, calc_params=row_dc.calc_params, dftd4_bool=row_dc.dftd4, txt=txt)
 
     atoms.calc.update({'symmetry': 'off'})
     metal_symbol = ['Co', 'Fe']

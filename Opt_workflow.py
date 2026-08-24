@@ -5,6 +5,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import sanitize, folder_exist, update_db, Row_descriptor
+from RMC_taskblaster.calculator_prepare import calculation_setter
 
 import taskblaster as tb
 from ase.optimize import BFGS
@@ -30,7 +31,9 @@ def optimise(row_wf, fmax: float=0.03):
     if world.rank == 0: folder_exist(os.path.basename(row_dc.db_path) + functional_folder)
 
     atoms = row_dc.atoms
-    atoms.calc.txt = f'{functional_folder}/opt_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
+    txt = f'{functional_folder}/opt_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
+
+    calculation_setter(atoms=atoms, calc_params=row_dc.calc_params, dftd4_bool=row_dc.dftd4, txt=txt)
 
     dyn = BFGS(row_dc.atoms, trajectory=None)
     dyn.run(fmax=fmax)
