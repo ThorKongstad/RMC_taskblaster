@@ -26,14 +26,14 @@ class Row_descriptor:
     adsorbate_str = tb.var()
 
     def as_dict(self): return dict(
-        db_path = self.db_path,
-        db_id = self.db_id,
-        atoms = self.atoms,
-        calc_params = self.calc_params,
-        xc = self.xc,
-        dftd4 = self.dftd4,
-        structure_str = self.structure_str,
-        adsorbate_str = self.adsorbate_str,
+        db_path=self.db_path.getvalue(),
+        db_id=self.db_id.getvalue(),
+        atoms=self.atoms.getvalue(),
+        calc_params=self.calc_params.getvalue(),
+        xc=self.xc.getvalue(),
+        dftd4=self.dftd4.getvalue(),
+        structure_str=self.structure_str.getvalue(),
+        adsorbate_str=self.adsorbate_str.getvalue(),
     )
 
     def as_dc(self): return make_dataclass('Row_descriptor_dc', list(self.as_dict().keys()))(**self.as_dict())

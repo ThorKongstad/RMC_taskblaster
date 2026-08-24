@@ -20,21 +20,21 @@ class Vib_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'calculation'})
     def run_vibration(self):
-        return tb.node(calc_vibration, row_wf=self, atoms=self.relaxed_atoms)
+        return tb.node(calc_vibration, row_dc=self.as_dc(), atoms=self.relaxed_atoms)
 
     @tb.task(tags={'organise'})
     def write_opt_result(self):
         return tb.node(update_db, db_dir=self.db_path, db_update_args=self.run_vibration)
 
 
-def calc_vibration(row_wf, atoms):
-    parprint(f'outstd of vib calculation for db entry {row_wf.db_id} with structure: {row_wf.structure_str}, adsorbate: {row_wf.adsorbate_str} and functional: {row_wf.functional}')
+def calc_vibration(row_dc, atoms):
+    parprint(f'outstd of vib calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.functional}')
 
-    functional_folder = sanitize(row_wf.xc) + ('_D4' if row_wf.dftd4 else '')
+    functional_folder = sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
     if world.rank == 0: folder_exist(functional_folder)
 
-    file_name = f'vib_id{row_wf.db_id}_{row_wf.structure_str}_{row_wf.adsorbate_str}'
-    atoms.calc['txt'] = os.path.basename(row_wf.db_path) + f'/{functional_folder}/{file_name}.txt'
+    file_name = f'vib_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}'
+    atoms.calc['txt'] = os.path.basename(row_dc.db_path) + f'/{functional_folder}/{file_name}.txt'
 
     atoms.calc.update({'symmetry': 'off'})
     metal_symbol = ['Co', 'Fe']
@@ -49,7 +49,7 @@ def calc_vibration(row_wf, atoms):
 
     atoms.set_constraint(constraint=FixAtoms(locked_metals))
 
-    vib = Vibrations(atoms, indices=atoms_for_vib, name=os.path.basename(row_wf.db_path) + f'/{functional_folder}/{file_name}')
+    vib = Vibrations(atoms, indices=atoms_for_vib, name=os.path.basename(row_dc.db_path) + f'/{functional_folder}/{file_name}')
     vib.run()
     vib_energies = vib.get_energies()
     thermo = HarmonicThermo(vib_energies, atoms.get_potential_energy(), ignore_imag_modes=True)
@@ -59,7 +59,7 @@ def calc_vibration(row_wf, atoms):
 
         with open(f'{functional_folder}/{file_name.replace("vib", "vib_en")}', 'r') as fil: energy_string = fil.read()
 
-        return dict(id=row_wf, vibration=True, zpe=row_wf.run_vibration.thermo.get_ZPE_correction(), vib_en=energy_string,
+        return dict(id=row_dc, vibration=True, zpe=row_dc.run_vibration.thermo.get_ZPE_correction(), vib_en=energy_string,
                     enthalpy=thermo.get_internal_energy(300), entropy=thermo.get_entropy(300),
                     free_E=thermo.get_helmholtz_energy(300))
 
