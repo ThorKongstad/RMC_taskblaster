@@ -35,7 +35,7 @@ def calc_vibration(row_wf, atoms):
     if world.rank == 0: folder_exist(functional_folder)
 
     file_name = f'vib_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}'
-    atoms.calc['txt'] = os.path.basename(row_dc.db_path) + f'/{functional_folder}/{file_name}.txt'
+    atoms.calc.txt = os.path.basename(row_dc.db_path) + f'/{functional_folder}/{file_name}.txt'
 
     atoms.calc.update({'symmetry': 'off'})
     metal_symbol = ['Co', 'Fe']

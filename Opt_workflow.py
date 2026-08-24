@@ -30,7 +30,7 @@ def optimise(row_wf, fmax: float=0.03):
     if world.rank == 0: folder_exist(os.path.basename(row_dc.db_path) + functional_folder)
 
     atoms = row_dc.atoms
-    atoms.calc['txt'] = f'{functional_folder}/opt_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
+    atoms.calc.txt = f'{functional_folder}/opt_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
 
     dyn = BFGS(row_dc.atoms, trajectory=None)
     dyn.run(fmax=fmax)
