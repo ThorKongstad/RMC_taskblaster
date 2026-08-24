@@ -34,7 +34,7 @@ def calc_vibration(row_wf, atoms):
     parprint(f'outstd of vib calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.functional}')
 
     functional_folder = os.path.dirname(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
-    if world.rank == 0: folder_exist(functional_folder)
+    if world.rank == 0: folder_exist(folder_name=os.path.basename(functional_folder), path=os.path.dirname(functional_folder))
 
     file_name = f'vib_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}'
     txt = f'{functional_folder}/{file_name}.txt'
