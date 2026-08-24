@@ -20,14 +20,15 @@ class Vib_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'calculation'})
     def run_vibration(self):
-        return tb.node(calc_vibration, row_dc=self.as_dc(), atoms=self.relaxed_atoms)
+        return tb.node(calc_vibration, row_wf=self, atoms=self.relaxed_atoms)
 
     @tb.task(tags={'organise'})
     def write_opt_result(self):
         return tb.node(update_db, db_dir=self.db_path, db_update_args=self.run_vibration)
 
 
-def calc_vibration(row_dc, atoms):
+def calc_vibration(row_wf, atoms):
+    row_dc = row_wf.as_dc()
     parprint(f'outstd of vib calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.functional}')
 
     functional_folder = sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')

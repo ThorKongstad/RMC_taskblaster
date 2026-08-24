@@ -15,14 +15,15 @@ from ase.parallel import parprint, world, barrier
 class Opt_RMC_Workflow(Row_descriptor):
     @tb.task(tags={'calculation'})
     def run_optimisation(self):
-        return tb.node(optimise, row_dc=self.as_dc())
+        return tb.node(optimise, row_wf=self)
 
     @tb.task(tags={'organise'})
     def write_opt_result(self):
         return tb.node(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, atoms=self.run_optimisation, relaxed=True, vibration=False, vib_en=False))
 
 
-def optimise(row_dc, fmax: float=0.03):
+def optimise(row_wf, fmax: float=0.03):
+    row_dc = row_wf.as_dc()
     parprint(f'outstd of opt calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
 
     functional_folder = sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
