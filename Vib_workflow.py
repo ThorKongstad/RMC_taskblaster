@@ -31,7 +31,7 @@ class Vib_RMC_Workflow(Row_descriptor):
 
 def calc_vibration(row_wf, atoms):
     row_dc = row_wf.as_dc()
-    parprint(f'outstd of vib calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.functional}')
+    parprint(f'outstd of vib calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
 
     functional_folder = os.path.dirname(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
     if world.rank == 0: folder_exist(folder_name=os.path.basename(functional_folder), path=os.path.dirname(functional_folder))
