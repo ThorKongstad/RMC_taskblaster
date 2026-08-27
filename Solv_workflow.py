@@ -2,7 +2,7 @@ import os
 import pathlib
 import sys
 from copy import deepcopy
-from functools import partial
+from dataclasses import make_dataclass
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import sanitize, folder_exist, update_db, Row_descriptor
@@ -29,11 +29,11 @@ class calc_solv_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'Calculation'})
     def calc_non_solvation_sp(self):
-        return tb.node(calc_non_solvation_sp_func, atoms=self.relaxed_atoms, row_wf=self, FD_bool=self.FD_bool)
+        return tb.node(calc_non_solvation_sp_func, atoms=self.relaxed_atoms, row_describ=self.as_dict(), FD_bool=self.FD_bool)
 
     @tb.task(tags={'Calculation'})
     def calc_solvation_sp(self):
-        return tb.node(calc_solvation_sp_func, atoms=self.relaxed_atoms, row_wf=self, FD_bool=self.FD_bool)
+        return tb.node(calc_solvation_sp_func, atoms=self.relaxed_atoms, row_describ=self.as_dict(), FD_bool=self.FD_bool)
 
     @tb.task(tags={'organise'})
     def subtract_solv_corr(self):
@@ -44,8 +44,8 @@ class calc_solv_RMC_Workflow(Row_descriptor):
         return tb.node(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, solvation_E=self.subtract_solv_corr))
 
 
-def calc_non_solvation_sp_func(row_wf, atoms, FD_bool):
-    row_dc = row_wf.as_dc()
+def calc_non_solvation_sp_func(row_describ, atoms, FD_bool):
+    row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
     parprint(f'outstd of non-solvation sp calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
     atoms = atoms.copy()
     functional_folder = os.path.dirname(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
@@ -60,8 +60,8 @@ def calc_non_solvation_sp_func(row_wf, atoms, FD_bool):
     return atoms.get_potential_energy()
 
 
-def calc_solvation_sp_func(row_wf, atoms, FD_bool):
-    row_dc = row_wf.as_dc()
+def calc_solvation_sp_func(row_describ, atoms, FD_bool):
+    row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
     parprint(f'outstd of solvation sp calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
     atoms = atoms.copy()
     functional_folder = os.path.dirname(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')

@@ -1,7 +1,8 @@
 import pathlib
 import sys
 import os
-#from functools import partial
+from copy import deepcopy
+from dataclasses import make_dataclass
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from RMC_taskblaster import sanitize, folder_exist, update_db, Row_descriptor
@@ -22,15 +23,15 @@ class Vib_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'calculation'})
     def run_vibration(self):
-        return tb.node(calc_vibration, row_wf=self, atoms=self.relaxed_atoms)
+        return tb.node(calc_vibration, row_describ=self.as_dict(), atoms=self.relaxed_atoms)
 
     @tb.task(tags={'organise'})
     def write_opt_result(self):
         return tb.node(update_db, db_dir=self.db_path, db_update_args=self.run_vibration)
 
 
-def calc_vibration(row_wf, atoms):
-    row_dc = row_wf.as_dc()
+def calc_vibration(row_describ, atoms):
+    row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
     parprint(f'outstd of vib calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
 
     functional_folder = os.path.dirname(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
@@ -39,9 +40,10 @@ def calc_vibration(row_wf, atoms):
     file_name = f'vib_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}'
     txt = f'{functional_folder}/{file_name}.txt'
 
-    calculation_setter(atoms=atoms, calc_params=row_dc.calc_params, dftd4_bool=row_dc.dftd4, txt=txt)
+    calc_params = deepcopy(row_dc.calc_params)
+    calc_params.update({'symmetry': 'off'})
+    calculation_setter(atoms=atoms, calc_params=calc_params, dftd4_bool=row_dc.dftd4, txt=txt)
 
-    atoms.calc.update({'symmetry': 'off'})
     metal_symbol = ['Co', 'Fe']
     metal_at, not_metal_at = [], []
     for i, at in enumerate(atoms):
