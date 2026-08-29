@@ -66,7 +66,7 @@ def calc_vibration(row_describ, atoms):
 
         with open(f'{functional_folder}/{file_name.replace("vib", "vib_en")}', 'r') as fil: energy_string = fil.read()
 
-        return dict(id=row_dc, vibration=True, zpe=thermo.get_ZPE_correction(), vib_en=energy_string,
+        return dict(id=row_dc.db_id, vibration=True, zpe=thermo.get_ZPE_correction(), vib_en=energy_string,
                     enthalpy=thermo.get_internal_energy(300), entropy=thermo.get_entropy(300),
                     free_E=thermo.get_helmholtz_energy(300))
 
