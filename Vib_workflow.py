@@ -26,7 +26,7 @@ class Vib_RMC_Workflow(Row_descriptor):
         return tb.node(calc_vibration, row_describ=self.as_dict(), atoms=self.relaxed_atoms)
 
     @tb.task(tags={'organise'})
-    def write_opt_result(self):
+    def write_vib_result(self):
         return tb.node(update_db, db_dir=self.db_path, db_update_args=self.run_vibration)
 
 
@@ -56,7 +56,7 @@ def calc_vibration(row_describ, atoms):
 
     atoms.set_constraint(constraint=FixAtoms(locked_metals))
 
-    vib = Vibrations(atoms, indices=atoms_for_vib, name=os.path.basename(row_dc.db_path) + f'/{functional_folder}/{file_name}')
+    vib = Vibrations(atoms, indices=atoms_for_vib, name=f'{functional_folder}/{file_name}')
     vib.run()
     vib_energies = vib.get_energies()
     thermo = HarmonicThermo(vib_energies, atoms.get_potential_energy(), ignore_imag_modes=True)
