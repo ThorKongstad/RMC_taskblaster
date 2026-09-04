@@ -25,7 +25,7 @@ from gpaw.solvation import (
 @tb.workflow
 class calc_solv_RMC_Workflow(Row_descriptor):
     relaxed_atoms = tb.var()
-    FD_bool = tb.var(default=False)
+    FD_bool = tb.var(default=True)
 
     @tb.task(tags={'Calculation'})
     def calc_non_solvation_sp(self):
