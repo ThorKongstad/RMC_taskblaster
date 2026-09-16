@@ -2,31 +2,17 @@ import argparse
 import pickle
 import pathlib
 import sys
-from dataclasses import make_dataclass
+import os
+import warnings
 
-sys.path.insert(0, str(pathlib.Path(__file__).parent))
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+from RMC_tb_pyscf import Row_descriptor
 from RMC_tb_pyscf.Opt_workflow import Opt_RMC_Workflow
 from RMC_tb_pyscf.Vib_workflow import Vib_RMC_Workflow
 #from RMC_tb_pyscf.Solv_workflow import calc_solv_RMC_Workflow
 
 import taskblaster as tb
 import ase.db as db
-
-
-@tb.workflow
-class Row_descriptor:
-    db_path = tb.var()
-    db_id = tb.var()
-    atoms = tb.var()
-    spin = tb.var()
-    calc_params = tb.var()
-    xc = tb.var()
-    dftd4 = tb.var()
-    structure_str = tb.var()
-    adsorbate_str = tb.var()
-
-    def as_dict(self): return dict(vars(self))
-    def as_dc(self): return make_dataclass('Row_descriptor_dc', list(self.as_dict().keys()))(**self.as_dict())
 
 
 @tb.workflow
@@ -60,6 +46,10 @@ class Workflow:
 @tb.dynamical_workflow_generator_task
 def generate_row_workflows(db_paths):
     for db_path in db_paths:
+        if not os.path.basename(db_path) in os.listdir(db_p if len(db_p := os.path.dirname(db_path)) > 0 else '.'):
+            warnings.warn(f"Can't find database: skipping {os.path.basename(db_path)}")
+            continue
+
         conn = db.connect(db_path)
         for row in conn.select():
             atoms = row.toatoms()

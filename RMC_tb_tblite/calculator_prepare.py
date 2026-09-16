@@ -7,32 +7,13 @@ from pathlib import Path
 import subprocess
 from copy import deepcopy
 
-#from gxtb.ase import GXTB  # placeholder — replace with your actual GxTB binding
-from tblite.ase import TBLite
-#from dftd4.ase import DFTD4
-#from ase.calculators.mixing import SumCalculator
-
 #sys.path.insert(0, str(pathlib.Path(__file__).parent))
 #from RMC_taskblaster import folder_exist
 
 import numpy as np
-from ase.db import connect
 from ase.io import read, write
-from ase.io.trajectory import Trajectory
-from ase.optimize import BFGS
 from ase.calculators.calculator import Calculator, all_changes
 from ase.units import Bohr, Hartree
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
-
-#def calculation_setter(atoms, calc_params, dftd4_bool, txt=None):
-#    calc_params_copy = deepcopy(calc_params)
-#    if txt is None:
-#        calc_params_copy.pop('txt', None)
-#    else:
-#        calc_params_copy.update({'txt': txt})
-#    if dftd4_bool:
-#        calc = SumCalculator([DFTD4(method=calc_params_copy['method']), GXTB(**calc_params_copy)])
-#    atoms.calc = calc
 
 
 def parse_xtb_energy(log_path: Path) -> float:
@@ -166,8 +147,6 @@ class GxTBSubprocess(Calculator):
 
 def calculation_setter(atoms, calc_params):
     calc_params_copy = deepcopy(calc_params)
-    # f_max = 0.01
-    #calc = TBLite(**calc_params_copy)
     calc = GxTBSubprocess(**calc_params_copy)
     atoms.calc = calc
 

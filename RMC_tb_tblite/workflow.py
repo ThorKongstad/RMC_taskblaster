@@ -6,10 +6,10 @@ import os
 import warnings
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from RMC_tb_tblite import Row_descriptor
+from . import Row_descriptor
 #from RMC_taskblaster.calculator_prepare import calculation_setter
-from RMC_tb_tblite.Opt_workflow import Opt_RMC_Workflow
-from RMC_tb_tblite.Vib_workflow import Vib_RMC_Workflow
+from .Opt_workflow import Opt_RMC_Workflow
+from .Vib_workflow import Vib_RMC_Workflow
 
 import taskblaster as tb
 import ase.db as db

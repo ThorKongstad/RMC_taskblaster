@@ -5,8 +5,8 @@ from copy import deepcopy
 from dataclasses import make_dataclass
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from RMC_tb_tblite import sanitize, folder_exist, update_db, Row_descriptor
-from RMC_tb_tblite.calculator_prepare import calculation_setter
+from . import sanitize, folder_exist, update_db, Row_descriptor
+from .calculator_prepare import calculation_setter
 
 
 import numpy as np

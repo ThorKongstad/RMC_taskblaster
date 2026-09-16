@@ -4,8 +4,8 @@ import sys
 from dataclasses import make_dataclass
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from RMC_tb_tblite import sanitize, folder_exist, update_db, Row_descriptor
-from RMC_tb_tblite.calculator_prepare import calculation_setter
+from . import sanitize, folder_exist, update_db, Row_descriptor
+from .calculator_prepare import calculation_setter
 
 import taskblaster as tb
 from ase.optimize import BFGS
@@ -23,7 +23,7 @@ class Opt_RMC_Workflow(Row_descriptor):
         return tb.node(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, atoms=self.run_optimisation, relaxed=True, vibration=False, vib_en=False))
 
 
-def optimise(row_describ, fmax: float=0.01):
+def optimise(row_describ, fmax: float=0.03):
     row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
     parprint(f'outstd of opt calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
 
