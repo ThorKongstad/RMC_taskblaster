@@ -4,8 +4,8 @@ import sys
 from dataclasses import make_dataclass
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from RMC_taskblaster import sanitize, folder_exist, update_db, Row_descriptor
-from RMC_taskblaster.calculator_prepare import calculation_setter
+from . import sanitize, folder_exist, update_db, Row_descriptor
+from .calculator_prepare import calculation_setter
 
 import taskblaster as tb
 from ase.optimize import BFGS

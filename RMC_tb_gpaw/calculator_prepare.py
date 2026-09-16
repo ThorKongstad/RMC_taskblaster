@@ -8,7 +8,7 @@ from dftd4.ase import DFTD4
 from ase.calculators.mixing import SumCalculator
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from RMC_taskblaster import folder_exist
+from . import folder_exist
 
 
 def calculation_setter(atoms, calc_params, dftd4_bool, txt=None):

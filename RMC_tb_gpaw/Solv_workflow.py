@@ -5,7 +5,7 @@ from copy import deepcopy
 from dataclasses import make_dataclass
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from RMC_taskblaster import sanitize, folder_exist, update_db, Row_descriptor
+from . import sanitize, folder_exist, update_db, Row_descriptor
 
 import taskblaster as tb
 from ase.optimize import BFGS
