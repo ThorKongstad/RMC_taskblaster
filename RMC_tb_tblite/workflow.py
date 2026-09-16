@@ -10,7 +10,6 @@ from RMC_tb_tblite import Row_descriptor
 #from RMC_taskblaster.calculator_prepare import calculation_setter
 from RMC_tb_tblite.Opt_workflow import Opt_RMC_Workflow
 from RMC_tb_tblite.Vib_workflow import Vib_RMC_Workflow
-from RMC_tb_tblite.Solv_workflow import calc_solv_RMC_Workflow
 
 import taskblaster as tb
 import ase.db as db
