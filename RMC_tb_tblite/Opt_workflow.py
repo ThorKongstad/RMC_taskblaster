@@ -25,7 +25,7 @@ class Opt_RMC_Workflow(Row_descriptor):
 
 def optimise(row_describ, fmax: float=0.03):
     row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
-    parprint(f'outstd of opt calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
+    parprint(f'outstd of opt calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str}')
 
     #functional_folder = os.path.dirname(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
     #if world.rank == 0: folder_exist(folder_name=os.path.basename(functional_folder), path=os.path.dirname(functional_folder))
