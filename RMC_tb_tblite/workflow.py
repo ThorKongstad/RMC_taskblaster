@@ -21,9 +21,9 @@ class RMC_Row_Workflow(Row_descriptor):
     def task1_opt(self):
         return Opt_RMC_Workflow(**self.as_dict())
 
-    @tb.subworkflow
-    def task2_vib(self):
-        return Vib_RMC_Workflow(relaxed_atoms=self.task1_opt.run_optimisation, **self.as_dict())
+#    @tb.subworkflow
+#    def task2_vib(self):
+#        return Vib_RMC_Workflow(relaxed_atoms=self.task1_opt.run_optimisation, **self.as_dict())
 
 #    @tb.subworkflow
 #    def task3_solv(self):
