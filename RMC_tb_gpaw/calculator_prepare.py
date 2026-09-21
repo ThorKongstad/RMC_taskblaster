@@ -11,8 +11,15 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from . import folder_exist
 
 
+def functional_exceptions(functional):
+    match functional:
+        case 'BEEF-vdW': return {'name': 'BEEF-vdW', 'backend': 'libvdwxc'}
+        case _: return functional
+
+
 def calculation_setter(atoms, calc_params, dftd4_bool, txt=None):
     calc_params_copy = deepcopy(calc_params)
+    calc_params_copy['xc'] = functional_exceptions(calc_params_copy['xc'])
     if txt is None:
         if 'txt' in calc_params.keys(): calc_params.pop('txt', None)
     else: calc_params_copy.update({'txt': txt})
