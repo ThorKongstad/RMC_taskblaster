@@ -39,7 +39,7 @@ def optimise(row_describ, fmax: float=0.03, timeout=20):
 
     calculation_setter(atoms=atoms, calc_params=row_dc.calc_params, timeout=timeout*60)
 
-    dyn = BFGS(row_dc.atoms, trajectory=None)
+    dyn = BFGS(row_dc.atoms, trajectory=None, maxstep=0.1)
 
     signal.signal(signal.SIGALRM, handler)
     signal.alarm(timeout*60)
