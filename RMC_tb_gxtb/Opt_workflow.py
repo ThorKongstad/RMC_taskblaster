@@ -2,6 +2,7 @@ import os
 import pathlib
 import sys
 from dataclasses import make_dataclass
+import signal
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from . import sanitize, folder_exist, update_db, Row_descriptor
@@ -23,7 +24,10 @@ class Opt_RMC_Workflow(Row_descriptor):
         return tb.node(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, atoms=self.run_optimisation, relaxed=True, vibration=False, vib_en=False))
 
 
-def optimise(row_describ, fmax: float=0.03):
+def handler(signum, frame): raise TimeoutError('BFGS timed out')
+
+
+def optimise(row_describ, fmax: float=0.03, timeout=20):
     row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
     parprint(f'outstd of opt calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str}')
 
@@ -33,10 +37,14 @@ def optimise(row_describ, fmax: float=0.03):
     atoms = row_dc.atoms
     #txt = f'{functional_folder}/opt_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
 
-    calculation_setter(atoms=atoms, calc_params=row_dc.calc_params)
+    calculation_setter(atoms=atoms, calc_params=row_dc.calc_params, timeout=timeout*60)
 
     dyn = BFGS(row_dc.atoms, trajectory=None)
-    dyn.run(fmax=fmax)
+
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(timeout*60)
+    try: dyn.run(fmax=fmax)
+    finally: signal.alarm(0)
 
     return atoms
 

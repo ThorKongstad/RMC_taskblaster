@@ -93,6 +93,7 @@ class GxTBSubprocess(Calculator):
         self.write_log = write_log
         self.keep_files = keep_files
         self._sp_counter = 0
+        self.timeout = None
 
     def calculate(self, atoms=None, properties=None, system_changes=all_changes):
         if properties is None:
@@ -122,6 +123,7 @@ class GxTBSubprocess(Calculator):
                 cwd=str(sp_dir),        # xtb writes gradient/charges here
                 stdout=fout,
                 stderr=subprocess.STDOUT,
+                timeout=self.timeout,
             )
 
         if result.returncode != 0:
@@ -145,9 +147,9 @@ class GxTBSubprocess(Calculator):
         return self.results.get("charges")
 
 
-def calculation_setter(atoms, calc_params):
+def calculation_setter(atoms, calc_params, timeout=None):
     calc_params_copy = deepcopy(calc_params)
-    calc = GxTBSubprocess(**calc_params_copy)
+    calc = GxTBSubprocess(**calc_params_copy, timeout=timeout)
     atoms.calc = calc
 
 
