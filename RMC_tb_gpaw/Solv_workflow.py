@@ -27,11 +27,11 @@ class calc_solv_RMC_Workflow(Row_descriptor):
     relaxed_atoms = tb.var()
     FD_bool = tb.var(default=True)
 
-    @tb.task(tags={'Calculation'})
+    @tb.task(tags={'calculation'})
     def calc_non_solvation_sp(self):
         return tb.node(calc_non_solvation_sp_func, atoms=self.relaxed_atoms, row_describ=self.as_dict(), FD_bool=self.FD_bool)
 
-    @tb.task(tags={'Calculation'})
+    @tb.task(tags={'calculation'})
     def calc_solvation_sp(self):
         return tb.node(calc_solvation_sp_func, atoms=self.relaxed_atoms, row_describ=self.as_dict(), FD_bool=self.FD_bool)
 
