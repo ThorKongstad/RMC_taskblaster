@@ -12,6 +12,7 @@ from ase.optimize import BFGS
 from ase.parallel import parprint, world, barrier
 from ase.units import mol, kJ, kcal, Pascal, m
 from gpaw import GPAW
+from gpaw.utilities import h2gpts
 from gpaw.solvation import (
     SolvationGPAW,
     EffectivePotentialCavity,
@@ -56,6 +57,7 @@ def calc_non_solvation_sp_func(row_describ, atoms, FD_bool):
 
     if FD_bool:
         calc_params.update({'mode': 'fd'})
+        calc_params.update({'gpts': h2gpts(0.16, atoms.get_cell(), idiv=16)})
         atoms.calc = GPAW(**calc_params)
 
     return atoms.get_potential_energy()
@@ -73,6 +75,7 @@ def calc_solvation_sp_func(row_describ, atoms, FD_bool):
 
     if FD_bool:
         calc_params.update({'mode': 'fd'})
+        calc_params.update({'gpts': h2gpts(0.16, atoms.get_cell(), idiv=16)})
 
     atomic_radii = {'H': 1.09, 'C': 1.77, 'N': 1.66, 'O': 1.50, 'Co': 2.4, 'Fe': 2.44}
 
