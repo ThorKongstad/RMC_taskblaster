@@ -6,6 +6,7 @@ from dataclasses import make_dataclass
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from . import sanitize, folder_exist, update_db, Row_descriptor
+from .calculator_prepare import functional_exceptions
 
 import taskblaster as tb
 from ase.optimize import BFGS
@@ -54,6 +55,7 @@ def calc_non_solvation_sp_func(row_describ, atoms, FD_bool):
 
     calc_params = deepcopy(row_dc.calc_params)
     calc_params['txt'] =f'{functional_folder}/sp{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
+    calc_params['xc'] = functional_exceptions(calc_params['xc'])
 
     if FD_bool:
         calc_params.update({'mode': 'fd'})
@@ -72,6 +74,8 @@ def calc_solvation_sp_func(row_describ, atoms, FD_bool):
 
     calc_params = deepcopy(row_dc.calc_params)
     calc_params['txt'] = f'{functional_folder}/solv{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
+    calc_params['xc'] = functional_exceptions(calc_params['xc'])
+
 
     if FD_bool:
         calc_params.update({'mode': 'fd'})
