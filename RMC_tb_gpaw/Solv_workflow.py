@@ -51,12 +51,13 @@ def calc_non_solvation_sp_func(row_describ, atoms, FD_bool):
     functional_folder = os.path.dirname(row_dc.db_path) + '/' + sanitize(row_dc.xc) + ('_D4' if row_dc.dftd4 else '')
     if world.rank == 0: folder_exist(folder_name=os.path.basename(functional_folder), path=os.path.dirname(functional_folder))
 
+    calc_params = deepcopy(row_dc.calc_params)
+    calc_params['txt'] =f'{functional_folder}/sp{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
+
     if FD_bool:
-        calc_params = deepcopy(row_dc.calc_params)
         calc_params.update({'mode': 'fd'})
         atoms.calc = GPAW(**calc_params)
 
-    atoms.calc.txt = f'{functional_folder}/sp{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
     return atoms.get_potential_energy()
 
 
@@ -68,6 +69,7 @@ def calc_solvation_sp_func(row_describ, atoms, FD_bool):
     if world.rank == 0: folder_exist(folder_name=os.path.basename(functional_folder), path=os.path.dirname(functional_folder))
 
     calc_params = deepcopy(row_dc.calc_params)
+    calc_params['txt'] = f'{functional_folder}/solv{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
 
     if FD_bool:
         calc_params.update({'mode': 'fd'})
@@ -83,8 +85,6 @@ def calc_solvation_sp_func(row_describ, atoms, FD_bool):
         interactions=[SurfaceInteraction(surface_tension=18.4 * 1e-3 * Pascal * m)],
         **calc_params)
     atoms.calc = calc
-
-    atoms.calc.txt = f'{functional_folder}/solv{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
 
     return atoms.get_potential_energy()
 
