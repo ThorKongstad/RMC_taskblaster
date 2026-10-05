@@ -8,6 +8,39 @@ import numpy as np
 import ase.db as db
 import pandas as pd
 from sqlite3 import OperationalError
+import taskblaster as tb
+
+
+def do_nothing(): return None
+
+
+@tb.workflow
+class Row_descriptor:
+    db_path = tb.var()
+    db_id = tb.var()
+    atoms = tb.var()
+    spin = tb.var()
+    calc_params = tb.var()
+    xc = tb.var()
+    dftd4 = tb.var()
+    structure_str = tb.var()
+    adsorbate_str = tb.var()
+
+    def as_dict(self): return dict(db_path=self.db_path,
+                                   db_id=self.db_id,
+                                   atoms=self.atoms,
+                                   spin=self.spin,
+                                   calc_params=self.calc_params,
+                                   xc=self.xc,
+                                   dftd4=self.dftd4,
+                                   structure_str=self.structure_str,
+                                   adsorbate_str=self.adsorbate_str)
+
+#    def as_dc(self): return make_dataclass('Row_descriptor_dc', list(self.as_dict().keys()))(**self.as_dict())
+
+    @tb.task
+    def doing_nothing(self):
+        return tb.node(do_nothing)
 
 
 @dataclass
@@ -67,7 +100,7 @@ def folder_exist(folder_name: str, path: str = '.') -> None:
 
 
 def ends_with(string: str, end_str: str) -> str:
-    return string + end_str * (end_str != string[-len(end_str):0])
+    return string + end_str * (end_str != string[-len(end_str):])
 
 
 def overpotential(dG_OOH: float, dG_OH: float, dG_O: float) -> float: return min((4.92 - dG_OOH, dG_OOH - dG_O, dG_O - dG_OH, dG_OH)) # 1.23 -
