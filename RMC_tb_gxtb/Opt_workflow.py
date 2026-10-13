@@ -58,5 +58,5 @@ def write_opt_result(row_describ, opt_output):
     atoms, results = opt_output
     atoms.calc = SinglePointCalculator(atoms, **results)
 
-    update_db(db_dir=row_dc.db_path, db_update_args=dict(id=row_dc.db_id, atoms=row_dc.run_optimisation, relaxed=True, vibration=False, vib_en=False))
+    update_db(db_dir=row_dc.db_path, db_update_args=dict(id=row_dc.db_id, atoms=atoms, relaxed=True, vibration=False, vib_en=False))
 
