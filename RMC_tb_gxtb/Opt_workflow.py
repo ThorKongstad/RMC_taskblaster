@@ -11,6 +11,7 @@ from .calculator_prepare import calculation_setter
 import taskblaster as tb
 from ase.optimize import BFGS
 from ase.parallel import parprint, world, barrier
+from ase.calculators.singlepoint import SinglePointCalculator
 
 
 @tb.workflow
@@ -45,6 +46,9 @@ def optimise(row_describ, fmax: float=0.03, timeout=20):
     signal.alarm(timeout*60)
     try: dyn.run(fmax=fmax)
     finally: signal.alarm(0)
+
+    calc_results = {k: v for k, v in atoms.calc.results.items() if k in ('energy', 'forces', 'charges')}
+    atoms.calc = SinglePointCalculator(atoms, **calc_results)
 
     return atoms
 
