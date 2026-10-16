@@ -10,6 +10,7 @@ from .calculator_prepare import calculation_setter
 import taskblaster as tb
 from ase.optimize import BFGS
 from ase.parallel import parprint, world, barrier
+from ase.calculators.singlepoint import SinglePointCalculator
 
 
 @tb.workflow
@@ -20,7 +21,7 @@ class Opt_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'organise'})
     def write_opt_result(self):
-        return tb.node(update_db, db_dir=self.db_path, db_update_args=dict(id=self.db_id, atoms=self.run_optimisation, relaxed=True, vibration=False, vib_en=False))
+        return tb.node(write_opt_result, row_describ=self.as_dict(), opt_output=self.run_optimisation)
 
 
 def optimise(row_describ, fmax: float=0.03):
@@ -38,5 +39,15 @@ def optimise(row_describ, fmax: float=0.03):
     dyn = BFGS(row_dc.atoms, trajectory=None)
     dyn.run(fmax=fmax)
 
-    return atoms
+    results = {k: v for k, v in atoms.calc.results.items() if k in ('energy', 'forces', 'charges')}
 
+    return atoms, results
+
+
+def write_opt_result(row_describ, opt_output):
+    row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
+
+    atoms, results = opt_output
+    atoms.calc = SinglePointCalculator(atoms, **results)
+
+    update_db(db_dir=row_dc.db_path, db_update_args=dict(id=row_dc.db_id, atoms=atoms, relaxed=True, vibration=False, vib_en=False))
