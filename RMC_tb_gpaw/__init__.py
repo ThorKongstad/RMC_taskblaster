@@ -11,10 +11,10 @@ from sqlite3 import OperationalError
 import taskblaster as tb
 
 
-def do_nothing(): return None
+#def do_nothing(): return None
 
 
-@tb.workflow
+#@tb.workflow
 class Row_descriptor:
     db_path = tb.var()
     db_id = tb.var()
@@ -38,9 +38,9 @@ class Row_descriptor:
 
     def as_dc(self): return make_dataclass('Row_descriptor_dc', list(self.as_dict().keys()))(**self.as_dict())
 
-    @tb.task
-    def doing_nothing(self):
-        return tb.node(do_nothing)
+#    @tb.task
+#    def doing_nothing(self):
+#        return tb.node(do_nothing)
 
 
 @dataclass
