@@ -39,7 +39,7 @@ class RMC_Row_Workflow(Row_descriptor):
 class Workflow:
     db_paths = tb.var()
 
-    @tb.dynamical_workflow_generator({'results': '*/*'})
+    @tb.dynamical_workflow_generator({})
     def rows(self):
         return tb.node(generate_row_workflows, db_paths=self.db_paths)
 
