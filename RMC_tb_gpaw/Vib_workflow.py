@@ -44,7 +44,7 @@ def calc_vibration(row_describ, atoms):
     calc_params.update({'symmetry': 'off'})
     calculation_setter(atoms=atoms, calc_params=calc_params, dftd4_bool=row_dc.dftd4, txt=txt)
 
-    metal_symbol = ['Co', 'Fe']
+    metal_symbol = ['Co', 'Fe', 'Mn', 'Ni', 'Cu', 'Sn']
     metal_at, not_metal_at = [], []
     for i, at in enumerate(atoms):
         if at.symbol in metal_symbol: metal_at.append(i)
