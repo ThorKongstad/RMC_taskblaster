@@ -12,6 +12,8 @@ import taskblaster as tb
 from ase.optimize import BFGS
 from ase.parallel import parprint, world, barrier
 from ase.units import mol, kJ, kcal, Pascal, m
+from ase.data import atomic_numbers
+from ase.data.vdw_alvarez import vdw_radii
 from gpaw import GPAW
 from gpaw.utilities import h2gpts
 from gpaw.solvation import (
@@ -76,12 +78,12 @@ def calc_solvation_sp_func(row_describ, atoms, FD_bool):
     calc_params['txt'] = f'{functional_folder}/solv{'_fd' if FD_bool else ''}_id{row_dc.db_id}_{row_dc.structure_str}_{row_dc.adsorbate_str}.txt'
     calc_params['xc'] = functional_exceptions(calc_params['xc'])
 
-
     if FD_bool:
         calc_params.update({'mode': 'fd'})
         calc_params.update({'gpts': h2gpts(0.16, atoms.get_cell(), idiv=16)})
 
-    atomic_radii = {'H': 1.09, 'C': 1.77, 'N': 1.66, 'O': 1.50, 'Co': 2.4, 'Fe': 2.44}
+#    atomic_radii = {'H': 1.09, 'C': 1.77, 'N': 1.66, 'O': 1.50, 'Co': 2.4, 'Fe': 2.44}
+    atomic_radii = {'H': 1.09} | {s: float(vdw_radii[atomic_numbers[s]]) for s in ('C', 'N', 'O', 'Co', 'Fe', 'Mn', 'Ni', 'Cu', 'Sn', 'Zn')}
 
     calc = SolvationGPAW(
         cavity=EffectivePotentialCavity(
@@ -94,6 +96,7 @@ def calc_solvation_sp_func(row_describ, atoms, FD_bool):
     atoms.calc = calc
 
     return atoms.get_potential_energy()
+
 
 def subtract(gas, solv):
     return solv - gas

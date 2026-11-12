@@ -54,6 +54,8 @@ def calc_vibration(row_describ, atoms):
     atoms_for_vib = list(filter(lambda i: (atoms[i].position[2] > (avg_metal_z_pos + 0.4)) or atoms[i].symbol in metal_symbol, list(range(len(atoms)))))
     locked_metals = list(filter(lambda i: (atoms[i].position[2] < (avg_metal_z_pos + 0.4)) and atoms[i].symbol not in metal_symbol, list(range(len(atoms)))))
 
+    assert len(metal_at) > 0
+
     atoms.set_constraint(constraint=FixAtoms(locked_metals))
 
     vib = Vibrations(atoms, indices=atoms_for_vib, name=f'{functional_folder}/{file_name}')
