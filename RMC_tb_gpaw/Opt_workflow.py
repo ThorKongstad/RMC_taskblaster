@@ -4,7 +4,7 @@ import sys
 from dataclasses import make_dataclass
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
-from . import sanitize, folder_exist, update_db, Row_descriptor
+from . import sanitize, folder_exist, update_db, Row_descriptor, mem_trim
 from .calculator_prepare import calculation_setter
 
 import taskblaster as tb
@@ -25,6 +25,7 @@ class Opt_RMC_Workflow(Row_descriptor):
 
 
 def optimise(row_describ, fmax: float=0.03):
+    mem_trim()
     row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
     parprint(f'outstd of opt calculation for db entry {row_dc.db_id} with structure: {row_dc.structure_str}, adsorbate: {row_dc.adsorbate_str} and functional: {row_dc.xc}')
 
@@ -37,6 +38,7 @@ def optimise(row_describ, fmax: float=0.03):
     calculation_setter(atoms=atoms, calc_params=row_dc.calc_params, dftd4_bool=row_dc.dftd4, txt=txt)
 
     dyn = BFGS(row_dc.atoms, trajectory=None)
+    dyn.attach(mem_trim)
     dyn.run(fmax=fmax)
 
     results = {k: v for k, v in atoms.calc.results.items() if k in ('energy', 'forces', 'charges')}

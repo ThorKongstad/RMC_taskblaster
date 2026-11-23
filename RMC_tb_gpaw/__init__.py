@@ -1,5 +1,6 @@
 import os
 import time
+import gc, ctypes
 from typing import NoReturn, Sequence, Tuple, Never, Optional, NamedTuple
 from dataclasses import dataclass, field, make_dataclass
 from itertools import chain
@@ -112,6 +113,11 @@ def mean(values: Sequence[float]) -> float: return sum(values) / len(values)
 def sd(values: Sequence[float], mean_value: Optional[float] = None) -> float:
     if not mean_value: mean_value = mean(values)
     return np.sqrt((1 / len(values)) * sum(((x - mean_value) ** 2 for x in values)))
+
+
+def mem_trim():
+    gc.collect()
+    ctypes.CDLL("libc.so.6").malloc_trim(0)
 
 
 @retry(retry=retry_if_exception_type(OperationalError), stop=stop_after_attempt(5), wait=wait_fixed(10))
