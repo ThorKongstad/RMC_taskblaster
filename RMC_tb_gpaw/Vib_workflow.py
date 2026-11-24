@@ -60,10 +60,11 @@ def calc_vibration(row_describ, atoms):
 
     vib = Vibrations(atoms, indices=atoms_for_vib, name=f'{functional_folder}/{file_name}')
     vib.run()
-    vib_energies = vib.get_energies()
-    thermo = HarmonicThermo(vib_energies, atoms.get_potential_energy(), ignore_imag_modes=True)
+    barrier()
 
     if world.rank == 0:
+        vib_energies = vib.get_energies()
+        thermo = HarmonicThermo(vib_energies, atoms.get_potential_energy(), ignore_imag_modes=True)
         vib.summary(log=f'{functional_folder}/{file_name.replace("vib", "vib_en")}')
 
         with open(f'{functional_folder}/{file_name.replace("vib", "vib_en")}', 'r') as fil: energy_string = fil.read()
