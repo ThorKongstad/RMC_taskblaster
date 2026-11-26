@@ -20,6 +20,7 @@ from ase.thermochemistry import HarmonicThermo, IdealGasThermo
 @tb.workflow
 class Vib_RMC_Workflow(Row_descriptor):
     relaxed_atoms = tb.var()
+    E_pot = tb.var()
 
     @tb.task(tags={'calculation'})
     def run_vibration(self):
@@ -27,7 +28,7 @@ class Vib_RMC_Workflow(Row_descriptor):
 
     @tb.task(tags={'organise'})
     def write_vib_result(self):
-        return tb.node(vib_thermo_to_db, row_describ=self.as_dict(), atoms=self.relaxed_atoms, vib_done=self.run_vibration, db_dir=self.db_path)
+        return tb.node(vib_thermo_to_db, row_describ=self.as_dict(), atoms=self.relaxed_atoms, vib_done=self.run_vibration, db_dir=self.db_path, E_pot=self.E_pot)
 
 def calc_vibration(row_describ, atoms):
     row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
@@ -50,13 +51,13 @@ def calc_vibration(row_describ, atoms):
     return dict(id=row_dc.db_id, vib_cache=f'{functional_folder}/{file_name}')  # small, all ranks identical
 
 
-def vib_thermo_to_db(row_describ, atoms, vib_done, db_dir):
+def vib_thermo_to_db(row_describ, atoms, vib_done, db_dir, E_pot):
     row_dc = make_dataclass('Row_descriptor_dc', list(row_describ.keys()))(**row_describ)
     functional_folder, file_name, indices, _ = vib_setup(row_dc, atoms)
 
     vib = Vibrations(atoms, indices=indices, name=vib_done['vib_cache'])  # reads cache, no calculator
     vib_energies = vib.get_energies()
-    thermo = HarmonicThermo(vib_energies, vib.cache['eq']['energy'], ignore_imag_modes=True)
+    thermo = HarmonicThermo(vib_energies, E_pot, ignore_imag_modes=True)
 
     summary_file = f'{functional_folder}/{file_name.replace("vib", "vib_en")}'
     vib.summary(log=summary_file)
